@@ -705,6 +705,71 @@ fn post_process_files_for_staging(output: &str) -> GeneratorResults {
         .collect_unordered_results()
 }
 
+/// Builds a suggestion for one worktree. The `exact_string` is the worktree's
+/// path because git identifies a working tree by its path (see the `worktree`
+/// arg in `git.json`), so the path is what makes the completed command run; the
+/// checked-out branch (or bare/detached state) is surfaced as the description.
+fn worktree_suggestion(path: &str, description: &str) -> Suggestion {
+    let description = if description.is_empty() {
+        "Working tree"
+    } else {
+        description
+    };
+    Suggestion::with_description(path, description).with_icon(IconType::Folder)
+}
+
+/// Parses `git worktree list --porcelain` output into worktree suggestions,
+/// excluding the main working tree.
+///
+/// The porcelain format emits one record per worktree, records separated by a
+/// blank line. A record opens with a `worktree <path>` line and is followed by
+/// attribute lines: `branch refs/heads/<name>`, `detached`, or `bare`. The path
+/// is inserted (see `worktree_suggestion`) and the branch/state becomes the
+/// description.
+///
+/// The main working tree is always listed first and is skipped: it is an invalid
+/// target for `git worktree lock`/`unlock` (both reject it) and for `remove`/
+/// `move` (both refuse it), which are the only consumers of this generator, so
+/// suggesting it would only ever produce a command that fails.
+fn post_process_worktrees(output: &str) -> GeneratorResults {
+    let output = filter_messages(output);
+    if output.starts_with("fatal:") {
+        return GeneratorResults::default();
+    }
+
+    let mut records: Vec<(&str, String)> = Vec::new();
+    for line in output.lines() {
+        if let Some(rest) = line.strip_prefix("worktree ") {
+            records.push((rest.trim(), String::new()));
+        } else if let Some((_, description)) = records.last_mut() {
+            if let Some(branch) = line.strip_prefix("branch ") {
+                let branch = branch.trim();
+                *description = branch
+                    .strip_prefix("refs/heads/")
+                    .unwrap_or(branch)
+                    .to_owned();
+            } else if line.trim() == "detached" {
+                *description = "detached HEAD".to_owned();
+            } else if line.trim() == "bare" {
+                *description = "bare".to_owned();
+            }
+        }
+    }
+
+    records
+        .into_iter()
+        .skip(1)
+        .map(|(path, description)| worktree_suggestion(path, &description))
+        .collect_ordered_results()
+}
+
+pub fn worktrees_generator() -> Generator {
+    Generator::script(
+        CommandBuilder::single_command("git --no-optional-locks worktree list --porcelain"),
+        post_process_worktrees,
+    )
+}
+
 pub fn generator() -> CommandSignatureGenerators {
     CommandSignatureGenerators::new("git")
         .add_generator("commits", commits_generator())
@@ -810,6 +875,7 @@ pub fn generator() -> CommandSignatureGenerators {
             ),
         )
         .add_generator("local_branches", local_branches_generator())
+        .add_generator("worktrees", worktrees_generator())
         .add_generator(
             "remotes",
             Generator::script(CommandBuilder::single_command("git --no-optional-locks remote -v"), |output| {
@@ -969,9 +1035,11 @@ mod tests {
         detect_refspec_prefix, files_for_staging_command, post_process_branches,
         post_process_diff_name_only, post_process_files_for_staging,
         post_process_push_refspec_branches, post_process_push_refspec_tags, post_process_tags,
+        post_process_worktrees, worktrees_generator,
     };
     use warp_completion_metadata::{
-        GeneratorResults, IconType, Importance, Order, Priority, Shell, Suggestion,
+        GeneratorProcess, GeneratorResults, IconType, Importance, Order, Priority, Shell,
+        Suggestion,
     };
 
     #[test]
@@ -1189,6 +1257,98 @@ mod tests {
     fn test_post_process_tags_filters_empty_lines() {
         let command_output = "v1.0.0\n\nv2.0.0\n";
         assert_eq!(post_process_tags(command_output).suggestions.len(), 2);
+    }
+
+    fn worktree(path: &str, description: &str) -> Suggestion {
+        Suggestion {
+            exact_string: path.to_owned(),
+            display_name: None,
+            description: Some(description.to_owned()),
+            priority: Priority::Default,
+            icon: Some(IconType::Folder),
+            is_hidden: false,
+        }
+    }
+
+    // Real `git worktree list --porcelain` output: one record per worktree,
+    // records separated by a blank line and a trailing blank line at the end.
+    // The main worktree (listed first — `/tmp/wt-demo`) is excluded because it
+    // is an invalid target for the consuming subcommands; the remaining linked
+    // worktrees insert their path with the branch (stripped of `refs/heads/`)
+    // or detached state as the description, in listing order.
+    #[test]
+    fn test_post_process_worktrees() {
+        let command_output = "worktree /tmp/wt-demo\nHEAD 847998979f929efd08cad0af6d10e9c22df3e16c\nbranch refs/heads/master\n\nworktree /tmp/wt-detached\nHEAD 847998979f929efd08cad0af6d10e9c22df3e16c\ndetached\n\nworktree /tmp/wt-feature\nHEAD 847998979f929efd08cad0af6d10e9c22df3e16c\nbranch refs/heads/feature\n\n";
+
+        let results = post_process_worktrees(command_output);
+        assert_eq!(
+            results,
+            GeneratorResults {
+                suggestions: vec![
+                    worktree("/tmp/wt-detached", "detached HEAD"),
+                    worktree("/tmp/wt-feature", "feature"),
+                ],
+                is_ordered: true,
+            }
+        );
+        // Regression: the main worktree must never be suggested.
+        assert!(
+            !results
+                .suggestions
+                .iter()
+                .any(|s| s.exact_string == "/tmp/wt-demo"),
+            "main worktree must be excluded from suggestions"
+        );
+    }
+
+    // A bare main worktree emits `bare` in place of HEAD/branch lines; it is
+    // still the first (main) record and is excluded, leaving only the linked one.
+    #[test]
+    fn test_post_process_worktrees_bare() {
+        let command_output = "worktree /repo/bare\nbare\n\nworktree /repo/linked\nHEAD abc123\nbranch refs/heads/main\n\n";
+
+        assert_eq!(
+            post_process_worktrees(command_output),
+            GeneratorResults {
+                suggestions: vec![worktree("/repo/linked", "main")],
+                is_ordered: true,
+            }
+        );
+    }
+
+    // A repository with only the main worktree yields no suggestions.
+    #[test]
+    fn test_post_process_worktrees_only_main() {
+        let command_output = "worktree /repo/main\nHEAD abc123\nbranch refs/heads/main\n\n";
+
+        assert_eq!(
+            post_process_worktrees(command_output),
+            GeneratorResults {
+                suggestions: vec![],
+                is_ordered: true,
+            }
+        );
+    }
+
+    // Fatal errors short-circuit to the default (empty, ordered) result.
+    #[test]
+    fn test_post_process_worktrees_fatal_error() {
+        assert_eq!(
+            post_process_worktrees("fatal: not a git repository\n"),
+            GeneratorResults::default()
+        );
+    }
+
+    // The generator sources worktrees from a locks-free porcelain listing.
+    #[test]
+    fn test_worktrees_generator_command() {
+        match worktrees_generator().process {
+            GeneratorProcess::ShellCommand(cmd) => assert_eq!(
+                cmd.build(Shell::Posix),
+                "git --no-optional-locks worktree list --porcelain"
+            ),
+            _ => panic!("worktrees generator should be a static shell command"),
+        }
     }
 
     #[test]
