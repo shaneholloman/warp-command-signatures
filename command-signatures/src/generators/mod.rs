@@ -69,6 +69,7 @@ mod sdk;
 mod ssh;
 mod systemctl;
 mod tar;
+mod tcpdump;
 mod terraform;
 mod timedatectl;
 mod tmux;
@@ -127,6 +128,7 @@ pub fn dynamic_command_signature_data() -> HashMap<String, DynamicCompletionData
         scp::generator(),
         ssh::generator(),
         tar::generator(),
+        tcpdump::generator(),
         terraform::generator(),
         kubectx::generator(),
         kubens::generator(),
