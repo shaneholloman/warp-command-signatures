@@ -1211,6 +1211,7 @@
         {
             "name": [
                 "neighbour",
+                "neighbor",
                 "neigh"
             ],
             "description": "ARP or NDISC cache entry",
@@ -1290,11 +1291,29 @@
                             "args": {
                                 "name": "PROTO",
                                 "suggestions": [
+                                    "unspec",
+                                    "redirect",
                                     "kernel",
                                     "boot",
                                     "static",
+                                    "gated",
                                     "ra",
-                                    "dhcp"
+                                    "mrt",
+                                    "zebra",
+                                    "bird",
+                                    "dnrouted",
+                                    "xorp",
+                                    "ntk",
+                                    "dhcp",
+                                    "keepalived",
+                                    "babel",
+                                    "ovn",
+                                    "openr",
+                                    "bgp",
+                                    "isis",
+                                    "ospf",
+                                    "rip",
+                                    "eigrp"
                                 ]
                             }
                         }
@@ -1378,11 +1397,29 @@
                             "args": {
                                 "name": "PROTO",
                                 "suggestions": [
+                                    "unspec",
+                                    "redirect",
                                     "kernel",
                                     "boot",
                                     "static",
+                                    "gated",
                                     "ra",
-                                    "dhcp"
+                                    "mrt",
+                                    "zebra",
+                                    "bird",
+                                    "dnrouted",
+                                    "xorp",
+                                    "ntk",
+                                    "dhcp",
+                                    "keepalived",
+                                    "babel",
+                                    "ovn",
+                                    "openr",
+                                    "bgp",
+                                    "isis",
+                                    "ospf",
+                                    "rip",
+                                    "eigrp"
                                 ]
                             }
                         }
@@ -1463,11 +1500,29 @@
                             "args": {
                                 "name": "PROTO",
                                 "suggestions": [
+                                    "unspec",
+                                    "redirect",
                                     "kernel",
                                     "boot",
                                     "static",
+                                    "gated",
                                     "ra",
-                                    "dhcp"
+                                    "mrt",
+                                    "zebra",
+                                    "bird",
+                                    "dnrouted",
+                                    "xorp",
+                                    "ntk",
+                                    "dhcp",
+                                    "keepalived",
+                                    "babel",
+                                    "ovn",
+                                    "openr",
+                                    "bgp",
+                                    "isis",
+                                    "ospf",
+                                    "rip",
+                                    "eigrp"
                                 ]
                             }
                         }
@@ -1551,11 +1606,29 @@
                             "args": {
                                 "name": "PROTO",
                                 "suggestions": [
+                                    "unspec",
+                                    "redirect",
                                     "kernel",
                                     "boot",
                                     "static",
+                                    "gated",
                                     "ra",
-                                    "dhcp"
+                                    "mrt",
+                                    "zebra",
+                                    "bird",
+                                    "dnrouted",
+                                    "xorp",
+                                    "ntk",
+                                    "dhcp",
+                                    "keepalived",
+                                    "babel",
+                                    "ovn",
+                                    "openr",
+                                    "bgp",
+                                    "isis",
+                                    "ospf",
+                                    "rip",
+                                    "eigrp"
                                 ]
                             }
                         }
@@ -1662,11 +1735,29 @@
                             "args": {
                                 "name": "PROTO",
                                 "suggestions": [
+                                    "unspec",
+                                    "redirect",
                                     "kernel",
                                     "boot",
                                     "static",
+                                    "gated",
                                     "ra",
+                                    "mrt",
+                                    "zebra",
+                                    "bird",
+                                    "dnrouted",
+                                    "xorp",
+                                    "ntk",
                                     "dhcp",
+                                    "keepalived",
+                                    "babel",
+                                    "ovn",
+                                    "openr",
+                                    "bgp",
+                                    "isis",
+                                    "ospf",
+                                    "rip",
+                                    "eigrp",
                                     "all"
                                 ]
                             }
@@ -1744,11 +1835,29 @@
                             "args": {
                                 "name": "PROTO",
                                 "suggestions": [
+                                    "unspec",
+                                    "redirect",
                                     "kernel",
                                     "boot",
                                     "static",
+                                    "gated",
                                     "ra",
+                                    "mrt",
+                                    "zebra",
+                                    "bird",
+                                    "dnrouted",
+                                    "xorp",
+                                    "ntk",
                                     "dhcp",
+                                    "keepalived",
+                                    "babel",
+                                    "ovn",
+                                    "openr",
+                                    "bgp",
+                                    "isis",
+                                    "ospf",
+                                    "rip",
+                                    "eigrp",
                                     "all"
                                 ]
                             }
