@@ -2,20 +2,17 @@
     "name": "make",
     "args": {
         "name": "target",
-        "generatorName": "list_targets"
+        "generatorName": "list_targets",
+        "isVariadic": true
     },
     "options": [
         {
             "name": "-j",
-            "args": [
-                {
-                    "name": "number"
-                },
-                {
-                    "name": "target",
-                    "generatorName": "list_targets"
-                }
-            ]
+            "args": {
+                "name": "N",
+                "isOptional": true
+            },
+            "description": "Allow N jobs at once; infinite jobs with no arg"
         },
         {
             "name": [
