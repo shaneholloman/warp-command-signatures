@@ -177,7 +177,7 @@
                     "description": "Set the target build stage to build",
                     "args": {
                         "name": "target build stage",
-                        "template": "filepaths"
+                        "generatorName": "from_as"
                     }
                 }
             ]
@@ -1495,7 +1495,8 @@
             "args": {
                 "name": "NAME[:TAG|@DIGEST]",
                 "template": "filepaths",
-                "debounce": true
+                "debounce": true,
+                "generatorName": "search"
             },
             "options": [
                 {
@@ -2928,7 +2929,7 @@
                             "description": "Set the target build stage to build",
                             "args": {
                                 "name": "target build stage",
-                                "template": "filepaths"
+                                "generatorName": "from_as"
                             }
                         }
                     ]
@@ -5639,7 +5640,7 @@
                             "description": "Set the target build stage to build",
                             "args": {
                                 "name": "target build stage",
-                                "template": "filepaths"
+                                "generatorName": "from_as"
                             }
                         }
                     ]
@@ -5838,7 +5839,8 @@
                     "args": {
                         "name": "NAME[:TAG|@DIGEST]",
                         "template": "filepaths",
-                        "debounce": true
+                        "debounce": true,
+                        "generatorName": "search"
                     },
                     "options": [
                         {

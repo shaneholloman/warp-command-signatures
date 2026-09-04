@@ -1,4 +1,4 @@
-use super::fig_parse;
+use super::output_parsers;
 use warp_completion_metadata::{CommandBuilder, CommandSignatureGenerators, Generator};
 
 pub fn generator() -> CommandSignatureGenerators {
@@ -9,7 +9,7 @@ pub fn generator() -> CommandSignatureGenerators {
                 CommandBuilder::single_command(
                     "git --no-optional-locks branch -a --no-color --sort=-committerdate",
                 ),
-                fig_parse::lines,
+                crate::generators::git::post_process_branches,
             ),
         )
         .add_generator(
@@ -18,7 +18,7 @@ pub fn generator() -> CommandSignatureGenerators {
                 CommandBuilder::single_command(
                     "until [[ ( -f turbo.json || $PWD = '/' ) ]]; do cd ..; done; cat turbo.json",
                 ),
-                fig_parse::lines,
+                output_parsers::turbo_pipeline,
             ),
         )
 }

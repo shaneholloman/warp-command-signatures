@@ -1,5 +1,5 @@
 {
-    "name": "ns",
+    "name": "nativescript",
     "description": "The NativeScript CLI lets you create, build, and deploy NativeScript based apps on iOS and Android devices",
     "subcommands": [
         {
@@ -237,7 +237,7 @@
                     "description": "Create a project using a predefined template",
                     "args": {
                         "name": "template",
-                        "generatorName": "curl_https_api_github_com_repos_nativescript_nativescript_app_templates_contents_packages"
+                        "generatorName": "nativescript_templates"
                     }
                 },
                 {

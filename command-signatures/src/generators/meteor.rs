@@ -1,4 +1,4 @@
-use super::fig_parse;
+use super::{output_parsers, template_filters};
 use warp_completion_metadata::{CommandBuilder, CommandSignatureGenerators, Generator};
 
 pub fn generator() -> CommandSignatureGenerators {
@@ -7,21 +7,22 @@ pub fn generator() -> CommandSignatureGenerators {
             "cat_meteor_packages",
             Generator::script(
                 CommandBuilder::single_command("cat ./.meteor/packages"),
-                fig_parse::lines,
+                output_parsers::meteor_packages,
             ),
         )
         .add_generator(
             "create",
             Generator::script(
                 CommandBuilder::single_command("meteor create --list"),
-                fig_parse::lines,
+                output_parsers::meteor_examples,
             ),
         )
         .add_generator(
             "list_platforms",
             Generator::script(
                 CommandBuilder::single_command("meteor list-platforms"),
-                fig_parse::lines,
+                output_parsers::named_lines,
             ),
         )
+        .add_filter("filter-json", template_filters::json())
 }

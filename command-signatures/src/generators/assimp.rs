@@ -1,4 +1,4 @@
-use super::fig_parse;
+use super::output_parsers;
 use warp_completion_metadata::{CommandBuilder, CommandSignatureGenerators, Generator};
 
 pub fn generator() -> CommandSignatureGenerators {
@@ -7,14 +7,14 @@ pub fn generator() -> CommandSignatureGenerators {
             "listexport",
             Generator::script(
                 CommandBuilder::single_command("assimp listexport"),
-                fig_parse::lines,
+                output_parsers::desc_extension,
             ),
         )
         .add_generator(
             "listext",
             Generator::script(
                 CommandBuilder::single_command("assimp listext"),
-                fig_parse::lines,
+                output_parsers::desc_extension,
             ),
         )
 }

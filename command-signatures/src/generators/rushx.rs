@@ -1,4 +1,4 @@
-use super::fig_parse;
+use super::output_parsers;
 use warp_completion_metadata::{CommandBuilder, CommandSignatureGenerators, Generator};
 
 pub fn generator() -> CommandSignatureGenerators {
@@ -8,7 +8,7 @@ pub fn generator() -> CommandSignatureGenerators {
             CommandBuilder::single_command(
                 "until [[ -f package.json ]] || [[ $PWD = '/' ]]; do cd ..; done; cat package.json",
             ),
-            fig_parse::lines,
+            output_parsers::json_script_keys,
         ),
     )
 }

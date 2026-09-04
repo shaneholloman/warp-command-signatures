@@ -1,4 +1,3 @@
-use super::fig_parse;
 use warp_completion_metadata::{CommandBuilder, CommandSignatureGenerators, Generator};
 
 pub fn generator() -> CommandSignatureGenerators {
@@ -6,7 +5,7 @@ pub fn generator() -> CommandSignatureGenerators {
         "git_branch",
         Generator::script(
             CommandBuilder::single_command("git branch --no-color"),
-            fig_parse::lines,
+            crate::generators::git::post_process_branches,
         ),
     )
 }
