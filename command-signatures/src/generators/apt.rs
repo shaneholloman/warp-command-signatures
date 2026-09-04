@@ -1,4 +1,5 @@
 /// Used for debian-based package managers like apt-get, aptitude, etc.
+use super::fig_parse;
 use warp_completion_metadata::{
     CommandBuilder, CommandSignatureGenerators, Generator, GeneratorResults,
     GeneratorResultsCollector, Priority, Suggestion,
@@ -95,6 +96,24 @@ pub fn aptitude_generators() -> CommandSignatureGenerators {
             Generator::script(
                 CommandBuilder::single_command(LIST_ALL_DEB_FILES_COMMAND),
                 list_all_deb_files_in_cwd,
+            ),
+        )
+}
+
+pub fn generator() -> CommandSignatureGenerators {
+    CommandSignatureGenerators::new("apt")
+        .add_generator(
+            "list",
+            Generator::script(
+                CommandBuilder::single_command("apt list --installed"),
+                fig_parse::lines,
+            ),
+        )
+        .add_generator(
+            "list_upgradable",
+            Generator::script(
+                CommandBuilder::single_command("apt list --upgradable"),
+                fig_parse::lines,
             ),
         )
 }

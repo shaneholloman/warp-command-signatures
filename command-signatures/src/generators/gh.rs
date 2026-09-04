@@ -1,3 +1,4 @@
+use super::fig_parse;
 use lazy_static::lazy_static;
 use regex::Regex;
 use warp_completion_metadata::{
@@ -43,6 +44,21 @@ pub fn generator() -> CommandSignatureGenerators {
                     })
                     .collect_unordered_results()
             }),
+        )
+
+        .add_generator(
+            "api_graphql_string_viewer",
+            Generator::script(
+                CommandBuilder::single_command("gh api graphql --paginate -f query='query($endCursor: String) { viewer { repositories(first: 100, after: $endCursor) { nodes { isPrivate, nameWithOwner, description } pageInfo { hasNextPage endCursor }}}}' --jq '.data.viewer.repositories.nodes[]'"),
+                fig_parse::lines,
+            ),
+        )
+        .add_generator(
+            "git_branch",
+            Generator::script(
+                CommandBuilder::single_command("git --no-optional-locks branch -r --no-color --sort=-committerdate"),
+                fig_parse::lines,
+            ),
         )
 }
 

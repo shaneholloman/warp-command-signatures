@@ -1,3 +1,4 @@
+use super::fig_parse;
 use warp_completion_metadata::{
     Alias, CommandBuilder, CommandSignatureGenerators, Generator, GeneratorResults,
     GeneratorResultsCollector, Suggestion,
@@ -320,6 +321,14 @@ pub fn pnpm_generators() -> CommandSignatureGenerators {
         .add_generator(
             "workspace_packages_generator",
             workspace_packages_generator(),
+        )
+
+        .add_generator(
+            "until_package_json_do_cd",
+            Generator::script(
+                CommandBuilder::single_command("until [[ -f package.json ]] || [[ $PWD = '/' ]]; do cd ..; done; cat package.json"),
+                fig_parse::lines,
+            ),
         )
 }
 
